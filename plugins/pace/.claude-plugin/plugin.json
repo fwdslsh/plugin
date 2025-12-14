@@ -1,0 +1,16 @@
+{
+  "name": "pace",
+  "version": "0.0.1",
+  "description": "Orchestrate long-running software development across multiple context windows using a two-agent architecture (initializer + coding agent). Provides structured artifacts and workflows for incremental feature development.",
+  "author": {
+    "name": "fwdslsh"
+  },
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "long-running",
+    "agent-harness",
+    "incremental-development",
+    "feature-tracking",
+    "multi-session"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+	"name": "fwdslsh-plugins",
+	"owner": {
+		"name": "Fwdslsh Plugins",
+		"email": "plugins@fwdslsh.dev"
+	},
+	"version": "0.0.1",
+	"plugins": [
+		{
+			"name": "pace",
+			"source": "./plugins/pace",
+			"description": "Provides agents, commands, and skills to manage long running implementations",			
+			"author": {
+				"name": "fwdslsh"
+			}
+		}
+	]
+}
