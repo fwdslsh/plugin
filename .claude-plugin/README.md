@@ -1,4 +1,4 @@
-# OpenCode Plugins
+# Claude Code Plugins
 
 This directory contains Claude Code plugins for the Pace orchestrator.
 

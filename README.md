@@ -1,229 +1,74 @@
-# Orchestrator - Long-Running Agent Harness
+# fwdslsh Plugins
 
-A Bun/TypeScript implementation that orchestrates continuous coding agent sessions using the **Claude Agent SDK** for maximum visibility into Claude's execution.
+This repository contains plugins for [Claude Code](https://github.com/anthropics/claude-code) and [OpenCode](https://opencode.ai).
 
-## Features
+## Available Plugins
 
-- **Full Visibility**: Uses the Claude Agent SDK directly to stream all messages, tool uses, and results
-- **Automatic Feature Progression**: Works through features in priority order
-- **Session Management**: Configurable session limits, failure thresholds, and delays
-- **Progress Tracking**: Monitors feature completion and provides detailed statistics
-- **Rich Output**: Shows system messages, assistant responses, tool executions, and results
+### PACE (Progressive Autonomous Coding Engine)
+
+A comprehensive plugin system that enables systematic feature development through specialized agents and workflows.
+
+#### Features
+
+- **Specialized Agents**: Architecture strategist, code reviewers, performance oracle, security sentinel, and more
+- **Project Initialization**: Automated setup with feature planning and progress tracking
+- **Continuous Development**: Structured workflows for feature implementation
+- **Code Review Pipeline**: Multiple specialized reviewers for comprehensive code analysis
+
+#### Usage
+
+The PACE plugin provides several commands:
+
+- `/pace-init-project` - Initialize a new project with PACE structure
+- `/pace-next-feature` - Work on the next feature in the queue
+- `/pace-continue-work` - Resume work on the current feature
+- `/pace-commit-feature` - Commit completed features with proper review
+
+See the [plugins/pace](./plugins/pace) directory for detailed documentation on available agents and commands.
 
 ## Installation
 
-First, install dependencies:
+### For Claude Code
 
-```bash
-bun install
-```
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/fwdslsh/agent-plugins.git
+   ```
 
-Make sure you have the `ANTHROPIC_API_KEY` environment variable set:
+2. Link plugins to your Claude Code installation (location varies by platform):
+   ```bash
+   # macOS/Linux example
+   ln -s /path/to/agent-plugins/plugins/pace ~/.claude/plugins/pace
+   ```
 
-```bash
-export ANTHROPIC_API_KEY=your-api-key-here
-```
+### For OpenCode
 
-## Usage
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/fwdslsh/agent-plugins.git
+   ```
 
-### Quick Start
-
-Run the orchestrator with default settings (10 sessions max):
-
-```bash
-bun run cli.ts
-```
-
-Or use the npm script:
-
-```bash
-npm run cli
-```
-
-### Common Options
-
-**Run until all features pass:**
-
-```bash
-bun run cli.ts --until-complete
-# or
-npm run cli:complete
-```
-
-**Run a specific number of sessions:**
-
-```bash
-bun run cli.ts --max-sessions 20
-```
-
-**Adjust failure tolerance:**
-
-```bash
-bun run cli.ts --max-failures 5
-```
-
-**Preview without executing:**
-
-```bash
-bun run cli.ts --dry-run --max-sessions 5
-```
-
-### All Options
-
-```
---project-dir, -d DIR    Project directory (default: current directory)
---max-sessions, -n N     Maximum number of sessions to run (default: 10)
---max-failures, -f N     Stop after N consecutive failures (default: 3)
---delay SECONDS          Seconds to wait between sessions (default: 5)
---until-complete         Run until all features pass (implies unlimited sessions)
---dry-run                Show what would be done without executing
---help, -h               Show this help message
-```
-
-## How It Works
-
-### Workflow
-
-1. **Orient**: Reads project state from `feature_list.json` and `claude-progress.txt`
-2. **Select Feature**: Chooses the next failing feature by priority (critical → high → medium → low)
-3. **Execute**: Invokes Claude Agent SDK with the coding agent prompt
-4. **Stream Output**: Shows all system messages, tool uses, and results in real-time
-5. **Verify**: Checks if the feature was marked as passing in `feature_list.json`
-6. **Repeat**: Continues to next feature or stops based on conditions
-
-### Stopping Conditions
-
-The orchestrator stops when:
-
-- All features are passing (success!)
-- Maximum sessions reached
-- Maximum consecutive failures reached
-- User interrupts (Ctrl+C)
-
-### Output Examples
-
-**System Initialization:**
-
-```
-📋 Session initialized:
-  - Model: claude-sonnet-4-5-20250929
-  - CWD: /path/to/project
-  - Tools: Read, Write, Edit, Bash, Grep, Glob, ...
-  - Permission mode: acceptEdits
-```
-
-**Tool Execution:**
-
-```
-🔧 Tool: Read
-   Input: {
-     "file_path": "/path/to/file.ts",
-     "offset": 1,
-     "limit": 50
-   }
-
-✅ Tool result: [file contents...]
-```
-
-**Session Result:**
-
-```
-🎯 Session Result
-============================================================
-Status: success
-Turns: 12
-Duration: 45.32s
-API Time: 38.21s
-Cost: $0.0234
-Tokens: 15234 in / 2891 out
-Cache: 12890 read / 0 created
-
-Result: Feature AUTH-001 implemented successfully
-============================================================
-```
-
-## Claude Agent SDK Benefits
-
-By using the Claude Agent SDK instead of just the Anthropic API, we get:
-
-1. **Full Tool Visibility**: See every tool call Claude makes with inputs and outputs
-2. **Session Management**: Automatic conversation history and context management
-3. **Permission Control**: Fine-grained control over file edits and command execution
-4. **Cost Tracking**: Built-in usage and cost reporting per session
-5. **Project Context**: Automatic loading of `CLAUDE.md` and project settings
-6. **Better Debugging**: Clear visibility into why Claude makes each decision
-
-## Integration with Feature List
-
-The orchestrator expects a `feature_list.json` file in the project directory with this structure:
-
-```json
-{
-	"features": [
-		{
-			"id": "AUTH-001",
-			"description": "Implement user authentication",
-			"priority": "critical",
-			"passes": false
-		},
-		{
-			"id": "UI-002",
-			"description": "Add dark mode toggle",
-			"priority": "medium",
-			"passes": true
-		}
-	],
-	"metadata": {
-		"lastUpdated": "2025-11-28T10:30:00Z"
-	}
-}
-```
-
-## Troubleshooting
-
-**Agent SDK not found:**
-
-```bash
-bun install @anthropic-ai/claude-agent-sdk
-```
-
-**API key not set:**
-
-```bash
-export ANTHROPIC_API_KEY=your-api-key-here
-```
-
-**Permission errors:**
-The orchestrator uses `permissionMode: 'acceptEdits'` to auto-accept file edits. Adjust in the code if you need different behavior.
-
-**No features progressing:**
-Check that:
-
-1. The coding agent prompt is appropriate for your project
-2. Features are clearly defined in `feature_list.json`
-3. The project environment is properly initialized (see `init.sh`)
-
-## Comparison to Python Version
-
-| Feature       | Python Version           | TypeScript (Bun) Version     |
-| ------------- | ------------------------ | ---------------------------- |
-| Runtime       | Python 3                 | Bun                          |
-| API           | Subprocess to Claude CLI | Claude Agent SDK             |
-| Visibility    | Command output only      | Full message streaming       |
-| Tool Tracking | None                     | Complete with inputs/outputs |
-| Cost Tracking | None                     | Built-in per session         |
-| Performance   | Subprocess overhead      | Direct SDK calls             |
-| Debugging     | Limited                  | Rich event stream            |
+2. Link plugins to your OpenCode installation:
+   ```bash
+   ln -s /path/to/agent-plugins/plugins/pace ~/.opencode/plugins/pace
+   ```
 
 ## Development
 
-To modify the orchestrator behavior, edit key sections:
+To create your own plugins, refer to the plugin structure in the `plugins/` directory:
 
-- **Prompt Construction**: `buildCodingPrompt()` method
-- **Feature Selection**: `getNextFeature()` method
-- **Success Criteria**: Check in `runCodingSession()` after execution
-- **Output Formatting**: Message handling in the `for await` loop
+```
+plugins/
+  your-plugin/
+    agent/           # Custom agent definitions
+    command/         # Command implementations
+    your-plugin.ts   # Plugin entry point
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-Same as parent project.
+CC-BY-4.0

@@ -8,7 +8,7 @@
 	"plugins": [
 		{
 			"name": "pace",
-			"source": "./plugins/pace",
+			"source": "./.claude-plugins/pace",
 			"description": "Provides agents, commands, and skills to manage long running implementations",			
 			"author": {
 				"name": "fwdslsh"
